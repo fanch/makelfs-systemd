@@ -1,0 +1,22 @@
+# Description: Utilitaire pour déterminer le type de fichier donné
+# URL: ftp://ftp.fu-berlin.de/unix/tools/file/
+# Maintainer: Christos Zoulas
+# Packager: tnuttens at gmail dot com
+
+source=(ftp://ftp.astron.com/pub/file/file-$version.tar.gz)
+build() {
+cd $name-$version
+./configure --prefix=/usr \
+--bindir=/bin --libdir=/lib
+make
+make check
+make DESTDIR=$PKG install
+}
+devel()
+{
+        cd $PKG
+        bsdtar -cf \
+        $PKGMK_PACKAGE_DIR/$name.devel#$version-$release-any.pkg.tar \
+        usr/share/misc usr/include
+        rm -r usr/{include,share/misc}
+}

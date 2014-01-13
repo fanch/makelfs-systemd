@@ -1,0 +1,12 @@
+# Description: un système de fichier en lecture seule hautement compressé.
+# URL: http://squashfs.sourceforge.net/
+# Maintainer: NuTyX core team
+# Packager: guy_
+source=(http://downloads.sourceforge.net/project/$name/$name$version.tar.gz)
+
+build() {
+cd $name$version/squashfs-tools
+make 
+mkdir -p $PKG/bin
+make INSTALL_DIR=$PKG/bin install
+}

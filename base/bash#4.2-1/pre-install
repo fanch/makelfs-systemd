@@ -1,0 +1,2 @@
+rm -f bin/bash
+rm -f bin/sh

@@ -1,0 +1,25 @@
+# Description: Outil permettant le traitement des fichiers Includes des librairies
+# URL: http://pkgconfig.freedesktop.org/
+# Maintainer: Tollef Fog Heen, tfheen at err dot no
+# Packager: tnuttens at gmail dot com
+source=(http://pkgconfig.freedesktop.org/releases/pkg-config-$version.tar.gz)
+build()
+{
+cd  pkg-config-$version
+./configure --prefix=/usr \
+--bindir=/bin \
+--with-internal-glib \
+--disable-host-tool \
+--docdir=/usr/share/doc/pkg-config-$version
+make
+make DESTDIR=$PKG install
+rm -f $PKG/usr/share/aclocal/g*
+}
+devel()
+{
+	cd $PKG
+	bsdtar -cf \
+	$PKGMK_PACKAGE_DIR/$name.devel#$version-$release-any.pkg.tar \
+	usr/share/aclocal
+	rm -r usr/share/aclocal
+}

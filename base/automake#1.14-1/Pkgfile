@@ -1,0 +1,13 @@
+# Description: Programmes  pour générer le fichier Makefile utilisé par autoconf
+# URL: http://www.gnu.org/software/automake/
+# Maintainer: http://www.linuxfromscratch.org/lfs/view/development/chapter06/automake.html
+# Packager: tnuttens at gmail dot com
+source=(http://ftp.gnu.org/gnu/$name/$name-$version.tar.xz)
+build() {
+cd automake-$version
+./configure --prefix=/usr \
+--docdir=$PKG/usr/share/doc/automake-$version
+make
+make prefix=$PKG/usr install
+rm -rf $PKG/usr/share/info/dir
+}

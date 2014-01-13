@@ -1,0 +1,23 @@
+# Description: Système de messages pour les bus
+# URL: http://dbus.freedesktop.org
+# Maintainer: cgit.freedesktop.org/dbus/dbus
+# Packager: thierryn1 at hispeed dot ch
+# Depends on: expat, xorg-libx11, xorg-libsm, xorg-libice
+# Run on: expat,xorg-libx11,xorg-libsm,xorg-libice
+
+source=(http://dbus.freedesktop.org/releases/dbus/dbus-$version.tar.gz )
+
+build() {
+	cd dbus-$version
+	./configure --prefix=/usr \
+            --sysconfdir=/etc \
+            --localstatedir=/var \
+            --libexecdir=/usr/lib/dbus-1.0 \
+            --disable-static
+make -C dbus libdbus-1.la           
+make -C dbus lib_LTLIBRARIES=libdbus-1.la \
+     install-libLTLIBRARIES \
+     install-dbusincludeHEADERS \
+     install-nodist_dbusarchincludeHEADERS
+make DESTDIR=$PKG install-pkgconfigDATA
+}

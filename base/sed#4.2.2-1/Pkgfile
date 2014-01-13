@@ -1,0 +1,18 @@
+# Description: The Sed package contains a stream editor
+# URL: http://www.gnu.org/software/sed//sed.html
+# Maintainer:  Ken Pizzini ken at gnu dot org , Paolo Bonzini bonzini at gnu dot org
+# Packager: pierre^
+
+source=(http://ftp.gnu.org/gnu/sed/sed-$version.tar.bz2)
+
+build()
+{
+cd sed-$version
+./configure --prefix=/usr --bindir=/bin \
+--libdir=/lib --htmldir=/usr/share/doc/sed-$version
+make
+make html
+make check
+make DESTDIR=$PKG install
+rm -rf $PKG/usr/share/info/dir
+}

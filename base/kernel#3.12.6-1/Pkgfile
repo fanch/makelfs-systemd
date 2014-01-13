@@ -1,0 +1,50 @@
+# Description: Version support à long terme avec les modules realtek 8168, nvidia, ati, broadcom et virtualbox
+# URL:  http://www.kernel.org
+# Maintainer: git.kernel.org/?p=linux/kernel/git/stable/linux-stable.git;a=summary
+# Packager: tnuttens at gmail dot com, lesibel at free dot fr
+
+PKGMK_NO_STRIP="yes"
+source=(http://www.kernel.org/pub/linux/kernel/v3.x/linux-${version}.tar.xz config config_64)
+
+build(){
+cd linux-${version}
+
+make mrproper
+case `uname -m` in
+        x86_64)
+        	cp $SRC/config_64 ./.config;;
+        i?86)
+        	cp $SRC/config ./.config;;
+esac
+
+#make menuconfig
+
+make
+
+# Install modules
+cd $SRC/linux-${version}
+sed -i "/rm\ -rf\ \$(MODLIB)\/kernel/d" Makefile
+make INSTALL_MOD_PATH=$PKG modules_install || make -j1 INSTALL_MOD_PATH=$PKG modules_install
+mkdir -p $PKG/boot
+case `uname -m` in
+        x86_64)
+                cp  System.map \
+                $PKG/boot/System_64.map-$version
+                cp  .config    \
+                $PKG/boot/config_64-$version
+                cp  arch/x86_64/boot/bzImage \
+                $PKG/boot/kernel-$version ;;
+        i?86)
+                cp  System.map \
+                $PKG/boot/System.map-$version
+                cp  .config \
+                $PKG/boot/config-$version
+                cp  arch/i386/boot/bzImage \
+                $PKG/boot/kernel-$version ;;
+esac
+ln -sf kernel-$version $PKG/boot/kernel
+cd $PKG/lib/modules/${version}/
+rm -f {build,source}
+ln -sv /usr/src/linux-${version} build
+ln -sv /usr/src/linux-${version} source
+}

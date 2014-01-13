@@ -1,0 +1,55 @@
+# Description: The Perl package contains the Practical Extraction and Report Language.
+# URL: http://www.perl.org/
+# Maintainer: perl5.git.perl.org/perl.git
+# Packager: pierre^
+source=(http://ftp.funet.fi/pub/CPAN/src/perl-$version.tar.bz2)
+build()
+{
+cd $name-$version
+
+if [ "`uname -m`" == "x86_64" ]; then
+	_ARCH="-Dcccdlflags='-fPIC'"
+else
+	_ARCH=""
+fi
+
+echo "127.0.0.1 localhost $(hostname)" > /etc/hosts
+
+
+sed -i -e "s|BUILD_ZLIB\s*= True|BUILD_ZLIB = False|"           \
+       -e "s|INCLUDE\s*= ./zlib-src|INCLUDE    = /usr/include|" \
+       -e "s|LIB\s*= ./zlib-src|LIB        = /lib|"         \
+    cpan/Compress-Raw-Zlib/config.in
+
+
+sh Configure -des  -Dusethreads \
+	-Dprefix=/ -Dperl5=/bin/perl -Dperlpath=/bin/perl -Dinstallbin=/bin \
+	-Dscriptdir=/bin -Dstartperl=#!/bin/perl -Dbin=/bin \
+	-Dshrpdir=/lib/share/perl5/base/x86_64-linux-thread-multi/CORE \
+	-Dprivlib=/lib/share/perl5/base \
+	-Darchlib=/lib/share/perl5/base \
+	-Dvendorprefix=/usr \
+	-Dvendorbin=/usr/bin \
+	-Dvendorlib=/usr/lib/share/perl5/vendor \
+	-Dvendorarch=/usr/lib/perl5/vendor \
+	-Dsiteprefix=/usr \
+	-Dsitebin=/usr/bin \
+	-Dsitelib=/usr/lib/perl5/site \
+	-Dsitearch=/usr/lib/perl5/site \
+	-Dprefix=/usr -Duseshrplib \
+	-Dman1dir=/usr/share/man/man1 \
+	-Dman3dir=/usr/share/man/man3 \
+	-Dpager="/bin/less isR" ${_ARCH}
+
+make
+make -k test || true
+make DESTDIR=$PKG install
+find $PKG -iname 'TODO*' -or \
+	-iname 'Change*' -or \
+	-iname 'README*' -or \
+	-name '*.bs' -or \
+	-name .packlist -or \
+	-name perllocal.pod | xargs rm
+find $PKG -depth -empty -exec rmdir {} \;
+chmod -R +w $PKG
+}

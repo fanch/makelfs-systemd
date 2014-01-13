@@ -1,0 +1,35 @@
+# Description: The OpenSSL package contains management tools and libraries relating to cryptography. These are useful for providing cryptography functions to other packages, such as OpenSSH, email applications and web browsers (for accessing HTTPS sites).
+# URL: http://www.openssl.org/
+# Maintainer: NuTyX core team
+# Packager: thierryn1 at hispeed dot ch
+source=(http://www.openssl.org/source/$name-$version.tar.gz
+	http://www.linuxfromscratch.org/patches/blfs/svn/openssl-$version-fix_parallel_build-1.patch
+	http://www.linuxfromscratch.org/patches/blfs/svn/openssl-$version-fix_pod_syntax-1.patch)
+PKGMK_GROUPS=(devel man doc)
+
+build() {
+cd $name-$version
+patch -Np1 -i ../openssl-$version-fix_parallel_build-1.patch
+patch -Np1 -i ../openssl-1.0.1e-fix_pod_syntax-1.patch
+
+./config --prefix=/usr \
+	--openssldir=/etc/ssl \
+	shared zlib-dynamic
+
+make
+make INSTALL_PREFIX=$PKG MANDIR=/usr/share/man MANSUFFIX=ssl install
+cp -v -r certs $PKG/etc/ssl
+
+mkdir -p  $PKG/usr/share/doc/openssl-$version
+cp -vfr doc/*     $PKG/usr/share/doc/openssl-$version
+
+}
+devel()
+{
+cd $PKG
+bsdtar -cf \
+$PKGMK_PACKAGE_DIR/$name.devel#$version-$release-any.pkg.tar \
+usr/lib*/pkgconfig usr/include
+
+rm -r usr/lib*/pkgconfig usr/include
+}

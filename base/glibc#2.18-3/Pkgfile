@@ -1,0 +1,88 @@
+# Description: The Glibc package contains the main C library. This library provides the basic routines for allocating memory, searching directories, opening and closing files, reading and writing files, string handling, pattern matching, arithmetic, and so on.
+# URL: https://www.gnu.org/software/libc/
+# Maintainer:
+# Packager: pierre^
+kernelversion=3.12.6
+PKGMK_GROUPS=(devel man doc)
+source=(http://www.kernel.org/pub/linux/kernel/v3.x/linux-$kernelversion.tar.xz
+	http://ftp.gnu.org/gnu/glibc/glibc-$version.tar.xz )
+build() {
+
+# Headers
+cd linux-$kernelversion
+make mrproper
+make headers_check
+make INSTALL_HDR_PATH=dest headers_install
+find dest/include \( -name .install -o -name ..install.cmd \) -delete
+mkdir -p $PKG/usr/include
+cp -rv dest/include/* $PKG/usr/include
+
+cd ../glibc-$version
+
+sed -i -e 's/static __m128i/inline &/' sysdeps/x86_64/multiarch/strstr.c
+sed -r -i 's/(3..89..)/\1 | 4.*/' configure
+
+mkdir -v ../glibc-build
+cd ../glibc-build
+
+../glibc-$version/configure --prefix=/ \
+--disable-profile \
+--enable-kernel=2.6.32 \
+--libexecdir=/lib/glibc \
+--datarootdir=/usr/share \
+--includedir=/usr/include
+
+make
+
+# make -k check 2>&1 | tee glibc-check-log
+# grep Error glibc-check-log
+
+make install_root=$PKG install
+mv $PKG/usr/share/i18n $PKG/lib/
+rm -rf $PKG/usr/share/info/dir
+
+touch $PKG/etc/ld.so.conf
+
+mkdir -pv $PKG/usr/lib/locale
+
+cp -v ../glibc-$version/sunrpc/rpc/*.h $PKG/usr/include/rpc
+cp -v ../glibc-$version/sunrpc/rpcsvc/*.h $PKG/usr/include/rpcsvc
+cp -v ../glibc-$version/nis/rpcsvc/*.h $PKG/usr/include/rpcsvc
+
+make install_root=$PKG localedata/install-locales
+
+cat > $PKG/etc/nsswitch.conf << "EOF"
+# Begin /etc/nsswitch.conf
+
+passwd: files
+group: files
+shadow: files
+
+hosts: files dns
+networks: files
+
+protocols: files
+services: files
+ethers: files
+rpc: files
+
+# End /etc/nsswitch.conf
+EOF
+
+
+cat > $PKG/etc/ld.so.conf << "EOF"
+# Begin /etc/ld.so.conf
+/lib
+/usr/lib
+/lib64
+/usr/lib64
+/usr/local/lib
+/opt/lib
+
+# Add an include directory
+include /etc/ld.so.conf.d/*.conf
+# End of  /etc/ld.so.conf
+EOF
+
+mkdir $PKG/etc/ld.so.conf.d
+}

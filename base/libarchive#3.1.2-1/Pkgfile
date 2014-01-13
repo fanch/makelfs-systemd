@@ -1,0 +1,18 @@
+# Description: The libarchive library provides a single interface for reading/writing various compression formats.
+# URL: http://people.freebsd.org/~kientzle/libarchive
+# Maintainer: NuTyX core team
+# Packager: thierryn1 at hispeed dot ch
+
+PKGMK_GROUPS=(devel doc man)
+
+source=(http://github.com/downloads/libarchive/libarchive/libarchive-$version.tar.gz)
+
+build() {
+cd $name-$version
+./configure --prefix=/usr \
+--mandir=/usr/share/man \
+--without-xml2 \
+--infodir=/usr/share/info 
+make
+make DESTDIR=$PKG install
+}

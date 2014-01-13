@@ -1,0 +1,62 @@
+# Description: The Vim package contains a powerful text editor.
+# URL: http://www.vim.org/
+# Maintainer: Bram Moolenaar et al., Juergen Weigert
+# Packager: pierre^
+source=(ftp://ftp.vim.org/pub/vim/unix/vim-$version.tar.bz2)
+PKGMK_CLEAN_OLD="no"
+build()
+{
+# This package is really special for different aspects
+# Locales are not in standard place
+# So we cannot cleanup at the end but we have to do it before
+# TODO find a solution for i686 arch
+
+rm -vf $PKGMK_PACKAGE_DIR/$name.*
+cd vim*
+
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+
+./configure --prefix=/usr --enable-multibyte \
+	--enable-gui=no --with-x=no \
+	--disable-gpm
+
+make
+make DESTDIR=$PKG install
+
+ln -sv vim $PKG/usr/bin/vi
+for L in $PKG/usr/share/man/{,*/}man1/vim.1; do
+	ln -sv vim.1 $(dirname $L)/vi.1
+done
+
+mkdir $PKG/{etc,usr/share/doc}
+
+ln -sv ../vim/vim73/doc $PKG/usr/share/doc/vim-$version
+
+cat > $PKG/etc/vimrc << "EOF"
+" Begin /etc/vimrc
+set background=dark
+set ruler
+set nocompatible
+set backspace=2
+syntax on
+
+" End /etc/vimrc
+EOF
+cd $PKG
+for loc in `cd usr/share/vim/vim74/lang/ && ls`; do
+	if [ -d usr/share/vim/vim74/lang/$loc ]; then
+		bsdtar -c $COMPRESSION -f \
+		$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
+		usr/share/vim/vim74/lang/$loc usr/share/vim/vim74/lang/menu_$loc*||true
+		rm -r usr/share/vim/vim74/lang/$loc usr/share/vim/vim74/lang/menu_$loc*||true
+	fi
+done
+}
+doc()
+{
+cd $PKG
+bsdtar -cf \
+$PKGMK_PACKAGE_DIR/$name.doc#$version-$release-any.pkg.tar \
+usr/share/vim/vim74/doc usr/share/doc
+rm -r usr/share/vim/vim74/doc usr/share/doc
+}

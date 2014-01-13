@@ -1,0 +1,36 @@
+# Description: Démon pour la gestion du matériel dans l'espace utilisateur
+# URL: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
+# Maintainer: cgit.freedesktop.org/systemd/
+# Packager: thierryn1 at hispeed dot ch
+# Depends on: glib, gperf, gobject-introspection
+# Run on: glib, gperf
+
+
+source=(http://www.freedesktop.org/software/systemd/systemd-$version.tar.xz)
+
+build()
+{
+cd systemd-$version
+./configure --prefix=/usr \
+            --sysconfdir=/etc \
+            --localstatedir=/var \
+            --libexecdir=/usr/lib \
+            --docdir=/usr/share/doc/systemd-208 \
+            --with-rootprefix= \
+            --with-rootlibdir=/lib \
+            --enable-split-usr \
+            --disable-gudev \
+            --without-python
+make
+make DESTDIR=$PKG install
+mkdir $PKG/sbin
+for tool in runlevel reboot shutdown poweroff halt telinit; do
+     ln -sfv ../bin/systemctl $PKG/sbin/$tool
+done
+ln -sfv ../lib/systemd/systemd $PKG/sbin/init
+
+mkdir -pv $PKG/var/log/journal
+
+sed -i "s@0775 root lock@0755 root root@g" $PKG/usr/lib/tmpfiles.d/legacy.conf
+
+}

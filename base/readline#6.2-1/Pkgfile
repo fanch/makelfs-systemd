@@ -1,0 +1,42 @@
+# Description: The Readline package is a set of libraries that offers command-line editing and history capabilities.
+# URL: http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+# Maintainer: Chet Ramey, chet dot ramey at case dot edu
+# Packager: pierre^
+
+source=(http://ftp.gnu.org/gnu/readline/readline-$version.tar.gz\
+		http://www.linuxfromscratch.org/patches/lfs/development/readline-6.2-fixes-1.patch)
+PKGMK_GROUPS=(devel man doc)
+build()
+{
+cd readline-$version
+
+sed -i '/MV.*old/d' Makefile.in
+sed -i '/{OLDSUFF}/c:' support/shlib-install
+
+patch -Np1 -i ../readline-6.2-fixes-1.patch
+./configure --prefix=/usr --libdir=/lib
+
+make SHLIB_LIBS=-lncurses
+
+make DESTDIR=$PKG install
+
+mkdir -p $PKG/usr/lib
+
+mv -v $PKG/lib/lib{readline,history}.a $PKG/usr/lib
+
+rm -rf $PKG/usr/share/info/dir
+
+mkdir -p $PKG/usr/share/doc/readline-$version
+install -v -m644 doc/*.{ps,pdf,html,dvi} \
+$PKG/usr/share/doc/readline-$version
+
+rm -rv $PKG/usr/bin
+}
+devel()
+{
+cd $PKG
+bsdtar -cf \
+$PKGMK_PACKAGE_DIR/$name.devel#$version-$release-any.pkg.tar \
+usr/lib/libhistory.a usr/lib/libreadline.a usr/include usr/share/readline
+rm -r usr/lib/libhistory.a usr/lib/libreadline.a usr/include usr/share/readline
+}

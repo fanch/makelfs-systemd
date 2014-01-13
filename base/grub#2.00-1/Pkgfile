@@ -1,0 +1,27 @@
+# Description: The GRUB package contains the GRand Unified Bootloader.
+# URL: http://www.gnu.org/software/grub/
+# Maintainer: NuTyX core team
+# Packager: pierre^
+  
+source=(ftp://ftp.gnu.org/gnu/grub/grub-2.00.tar.xz\
+	grub.cfg)
+build() {
+	cd grub-2.00
+	sed -i -e '/gets is a/d' grub-core/gnulib/stdio.in.h
+	unset CXXFLAGS
+	./configure --prefix=/ \
+                    --mandir=/usr/share/man \
+		--sysconfdir=/etc       \
+		--disable-grub-emu-usb  \
+		--disable-efiemu \
+		--infodir=/usr/share/info \
+		--disable-werror
+	make
+	make DESTDIR=$PKG install
+        install -d $PKG/boot/grub
+        install -d $PKG/usr/share
+        rm -rf $PKG/usr/share/info/dir
+	install -Dm644 ../grub.cfg \
+	$PKG/boot/grub/grub.cfg.exemple
+}
+  

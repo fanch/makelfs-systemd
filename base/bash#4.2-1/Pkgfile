@@ -1,0 +1,33 @@
+# Description: The Bash package contains the Bourne-Again SHell.
+# URL: http://www.gnu.org/software/bash/
+# Maintainer: Brian Fox, Chet Ramey and many more
+# Packager: pierre^
+source=(http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz \
+	http://www.linuxfromscratch.org/patches/lfs/development/bash-$version-fixes-12.patch)
+
+build()
+{
+cd bash-$version
+
+patch -Np1 -i ../bash-$version-fixes-12.patch
+
+./configure --prefix=/usr --bindir=/bin \
+--htmldir=/usr/share/doc/bash-4.2 --without-bash-malloc \
+--with-installed-readline
+make
+
+# if [ -f /tools/bin/make ]; then
+#	chown -Rv nobody .
+#	/tools/bin/su nobody -s /bin/bash -c "/tools/bin/make tests"
+# fi
+make DESTDIR=$PKG install
+
+rm -rf $PKG/usr/share/info/dir
+
+ln -s bash $PKG/bin/sh
+
+if [ -L /bin/bash ];then
+	echo "Make shure to do before go on"
+	echo "exec /bin/bash --login +h"
+fi
+}

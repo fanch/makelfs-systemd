@@ -1,0 +1,17 @@
+# Description: Permet le transfer de fichiers en ligne de commande, protocoles: http, https, ftp, telnet, etc
+# URL: http://curl.haxx.se/
+# Packager: thierryn1 at hispeed dot ch
+# Maintainer: github.com/bagder/curl
+
+source=(http://curl.haxx.se/download/$name-$version.tar.bz2)
+
+PKGMK_GROUPS=(devel doc man)
+
+build() {
+cd $name-$version
+sed -i '/--static-libs)/{N;s#echo .*#echo #;}' curl-config.in
+./configure --prefix=/usr --with-ca-path=/etc/ssl/certs \
+--disable-static --enable-threaded-resolver
+make
+make DESTDIR=$PKG install
+}

@@ -1,0 +1,17 @@
+# Description: Utilitaires pour la gestion du système de fichiers Reiserfs
+# URL: http://www.kernel.org/pub/linux/utils/fs/reiserfs/
+# Maintainer: NuTyX core team
+# Packager: thierryn1 at hispeed dot ch
+
+source=(http://ftp.kernel.org/pub/linux/kernel/people/jeffm/reiserfsprogs/v${version}/$name-$version.tar.xz)
+
+
+build() {
+        cd $name-$version
+        ./configure --prefix=/usr \
+                --sbindir=/sbin
+        make
+        make DESTDIR=$PKG install
+        ln -sf reiserfsck $PKG/sbin/fsck.reiserfs
+        ln -sf mkreiserfs $PKG/sbin/mkfs.reiserfs
+}

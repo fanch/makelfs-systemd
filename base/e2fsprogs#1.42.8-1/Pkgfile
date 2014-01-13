@@ -1,0 +1,43 @@
+# Description: The E2fsprogs package contains the utilities for handling the ext2 file system. It also supports the ext3 and ext4 journaling file systems
+# URL: http://e2fsprogs.sourceforge.net/
+# Maintainer: Ted Ts'o tytso at mit dot edu or tytso at alum dot mit dot edu
+# Packager: pierre^
+source=(http://prdownloads.sourceforge.net/$name/$name-$version.tar.gz)
+PKGMK_GROUPS=(devel man doc)
+build()
+{
+cd $name-$version
+mkdir -v build
+cd build
+PKG_CONFIG_PATH="/usr/lib/pkgconfig"  ../configure --prefix=/usr --with-root-prefix="" --libdir=/lib \
+--bindir=/bin --sbindir=/sbin \
+--enable-elf-shlibs --disable-libblkid --disable-libuuid --disable-uuidd \
+--disable-fsck
+make
+# somes tests may fails
+# make check||true
+make DESTDIR=$PKG install install-libs || make -j1 DESTDIR=$PKG install install-libs
+
+chmod -v u+w $PKG/lib/{libcom_err,libe2p,libext2fs,libss}.a
+
+gunzip -v $PKG/usr/share/info/libext2fs.info.gz
+
+makeinfo -o doc/com_err.info ../lib/et/com_err.texinfo
+
+install -v -m644 doc/com_err.info $PKG/usr/share/info
+
+rm -rf $PKG/usr/share/info/dir
+
+mkdir $PKG/usr/lib
+mv $PKG/lib/pkgconfig \
+$PKG/usr/lib
+}
+devel()
+{
+cd $PKG
+bsdtar -cf \
+$PKGMK_PACKAGE_DIR/$name.devel#$version-$release-any.pkg.tar \
+usr/include usr/lib/pkgconfig usr/share/et usr/share/ss
+
+rm -r usr/{include,lib/pkgconfig,share/et,share/ss}
+}

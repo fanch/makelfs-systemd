@@ -1,0 +1,16 @@
+# Description: Collection de programmes pour gérer les connections réseaux
+# URL: http://www.tazenda.demon.co.uk
+# Maintainer: NuTyX core team
+# Packager: thierryn1 at hispeed dot ch
+
+source=(http://sourceforge.net/projects/${name}/files/latest/download/${name}-${version}.tar.bz2
+	http://nutyx.meticul.eu/files/patchs/$name/net-tools-1.60-make-1.patch)
+build() {
+unset MAKEFLAGS
+cd $name-$version
+patch -Np1 -i ../net-tools-1.60-make-1.patch
+
+yes "" | make
+make BASEDIR=$PKG update
+rm -rf $PKG/usr/share/man/man1
+}

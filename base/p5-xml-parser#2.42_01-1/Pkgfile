@@ -1,0 +1,18 @@
+# Description: Module perl pour le traitement des documents xml
+# URL: http://search.cpan.org/dist/XML-Parser/
+# Maintainer: NuTyX core team
+# Packager: thierryn1 at hispeed dot ch
+# Depends on:expat,perl
+# Run on:expat,perl
+
+release=1
+source=(http://search.cpan.org/CPAN/authors/id/T/TO/TODDR/XML-Parser-$version.tar.gz)
+
+
+build() {
+	cd XML-Parser-$version
+        perl Makefile.PL
+	make OPTIMIZE="$CFLAGS"
+	make DESTDIR=$PKG install
+	find $PKG -name .packlist -o -name perllocal.pod -exec rm '{}' \; 
+}
