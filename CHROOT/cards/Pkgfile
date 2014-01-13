@@ -1,0 +1,76 @@
+version=0.2.81.0
+source=(http://downloads.nutyx.org/files/cards-$version.tar.gz)
+build()
+{
+cd cards-$version
+cat > main.cc << "EOF"
+
+#include <iostream>
+#include <string>
+#include <memory>
+#include <cstdlib>
+#include <libgen.h>
+#include "pkgadd.h"
+#include "pkginfo.h"
+#include "pkgrm.h"
+
+using namespace std;
+
+static pkgdbh* select_utility(const string& name)
+{
+        if (name == "pkgadd")
+                return new pkgadd;
+	else if (name == "pkginfo")
+		return new pkginfo;
+	else if (name == "pkgrm")
+		return new pkgrm;
+        else
+                throw runtime_error("command not supported by cards");
+}
+
+int main(int argc, char** argv)
+{
+        string name = basename(argv[0]);
+
+        try {
+                auto_ptr<pkgdbh> util(select_utility(name));
+
+                // Handle common options
+                for (int i = 1; i < argc; i++) {
+                        string option(argv[i]);
+                        if (option == "-v" || option == "--version") {
+                                util->print_version();
+                                return EXIT_SUCCESS;
+                        } else if (option == "-h" || option == "--help") {
+                                util->printHelp();
+                                return EXIT_SUCCESS;
+                        }
+                }
+
+                util->run(argc, argv);
+        } catch (runtime_error& e) {
+                cerr << name << ": " << e.what() << endl;
+                return EXIT_FAILURE;
+        }
+
+        return EXIT_SUCCESS;
+}
+EOF
+g++ -DNDEBUG -O2 -Wall -pedantic -D_GNU_SOURCE -DVERSION=\"$version\" \
+-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC  string_utils.cc \
+file_utils.cc process.cc runtime_dependencies_utils.cc pkgdbh.cc pkgadd.cc pkginfo.cc pkgrm.cc main.cc \
+-o pkgadd -larchive -llzma
+
+install -m755 pkgadd /tools/bin/pkgadd
+
+ln -sv pkgadd /tools/bin/pkginfo
+ln -sv pkgadd /tools/bin/pkgrm
+
+sed -e "s/#VERSION#/$VERSION/" pkgmk.in > /tools/bin/pkgmk
+sed -i "s/profile/noprofile/" /tools/bin/pkgmk
+chmod 755 /tools/bin/pkgmk
+install -m666 pkgmk.conf /tools/etc/pkgmk.conf
+sed -i "s@PKGMK_IGNORE_MD5SUM=\"no\"@PKGMK_IGNORE_MD5SUM=\"yes\"@" \
+/tools/bin/pkgmk
+mkdir -pv $LFS/var/lib/pkg/DB
+}

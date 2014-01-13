@@ -1,0 +1,15 @@
+version=5.9
+source=(\
+ftp://invisible-island.net/ncurses/ncurses-$version.tar.gz)
+
+build()
+{
+cd ncurses-$version
+
+./configure --prefix=/tools --with-shared \
+ --without-debug --without-ada --enable-overwrite
+	
+make
+	
+make install
+}
