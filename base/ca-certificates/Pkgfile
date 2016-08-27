@@ -1,10 +1,9 @@
-# Description: La Public Key Inrastructure (infrastructure de clés publiques) est utilisés dans de nombreux cas de sécurité sur un système Linux.
-# Url: http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1
-# Maintainer: http://www.linuxfromscratch.org/blfs/view/svn/postlfs/cacerts.html
-# Packager: tnuttens at gmail dot com
+# Description: Certificate Authority certificates, the Public Key Infrastructure.
+# URL: http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1
+# Packager: tnut at nutyx dot org
 
 name=ca-certificates
-version=20130501
+version=20160110
 release=1
 
 source=(http://downloads.nutyx.org/files/$name-$version.tar.gz)
@@ -204,7 +203,7 @@ function mydate()
   certdate="${y}${m}${d}"
 }
 
-OPENSSL=/usr/bin/openssl
+OPENSSL="`which openssl`"
 DIR=/etc/ssl/certs
 
 if [ $# -gt 0 ]; then

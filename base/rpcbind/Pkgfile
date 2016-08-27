@@ -1,0 +1,37 @@
+# Description: portmap replacement which supports RPC over various protocols
+# URL: http://rpcbind.sourceforge.net/
+# Packager: alienus at nutyx dot org, tnut at nutyx dot org
+# Depends on: libtirpc
+
+PKGMK_GROUPS=(man)
+name=rpcbind
+version=0.2.3
+release=2
+
+source=(http://downloads.sourceforge.net/rpcbind/rpcbind-$version.tar.bz2
+	http://www.linuxfromscratch.org/patches/blfs/svn/rpcbind-0.2.3-tirpc_fix-1.patch)
+
+build() {
+    source /etc/blfs-systemd-units
+
+    wget http://www.linuxfromscratch.org/blfs/downloads/systemd/$scripts-$scriptsversion.tar.bz2
+    tar xvf $scripts-$scriptsversion.tar.bz2
+
+    cd rpcbind-$version
+    sed -i "/servname/s:rpcbind:sunrpc:" src/rpcbind.c
+    patch -Np1 -i ../rpcbind-0.2.3-tirpc_fix-1.patch
+
+    ./configure --prefix=/usr \
+                --bindir=/sbin \
+                --with-rpcuser=root \
+		--without-systemdsystemunitdir
+    make
+    make DESTDIR=$PKG install
+
+    cd ../$scripts-$scriptsversion
+    make DESTDIR=$PKG install-rpcbind
+    make DESTDIR=$PKG install-netfs
+
+    # cut is in /bin
+    sed -i "s,usr/bin/cut,bin/cut," $PKG/etc/rc.d/init.d/netfs
+}

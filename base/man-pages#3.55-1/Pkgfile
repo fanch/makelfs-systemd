@@ -1,8 +1,0 @@
-source=(\
-http://www.kernel.org/pub/linux/docs/man-pages/man-pages-3.55.tar.xz)
-build()
-{
-cd  man-pages-$version
-make 
-make DESTDIR=$PKG install
-}

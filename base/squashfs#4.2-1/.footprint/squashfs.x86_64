@@ -1,4 +1,0 @@
--rw-r--r--	root/root	.META
-drwxr-xr-x	root/root	bin/
--rwxr-xr-x	root/root	bin/mksquashfs
--rwxr-xr-x	root/root	bin/unsquashfs

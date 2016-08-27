@@ -1,0 +1,18 @@
+# Description: The mdadm package contains administration tools for software RAID.
+# URL: http://www.cse.unsw.edu.au/~neilb/source/mdadm/
+# Packager: pierre at nutyx dot org
+
+name=mdadm
+version=3.4
+release=1
+
+source=(http://www.kernel.org/pub/linux/utils/raid/$name/$name-$version.tar.xz)
+
+build() {
+cd $name-$version
+sed -i 's/Wall -Werror/Wall/' Makefile
+make  CHECK_RUN_DIR=0
+make INSTALL=/usr/bin/install DESTDIR=$PKG install sed -e 's/{DEFAULT_METADATA}/1.2/g' \
+-e 's,{MAP_PATH},/run/mdadm/map,g'  mdadm.8.in > mdadm.8
+rm -r $PKG/lib
+}
