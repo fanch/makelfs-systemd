@@ -1,13 +1,15 @@
-version=5.9
-source=(\
-ftp://invisible-island.net/ncurses/ncurses-$version.tar.gz)
+version=6.0
+source=(ftp://invisible-island.net/ncurses/ncurses-$version.tar.gz)
 
 build()
 {
 cd ncurses-$version
 
+sed -i s/mawk// configure
+
 ./configure --prefix=/tools --with-shared \
- --without-debug --without-ada --enable-overwrite
+ --without-debug --without-ada --enable-widec  \
+ --enable-overwrite
 	
 make
 	

@@ -27,10 +27,8 @@ perl
 sed
 tar
 texinfo
+util-linux
 xz
 zlib
-openssl
-wget
 libarchive
-rsync
 cards

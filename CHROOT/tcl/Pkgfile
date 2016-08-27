@@ -1,5 +1,5 @@
-version=8.6.1
-source=(http://prdownloads.sourceforge.net/tcl/tcl${version}-src.tar.gz)
+version=8.6.6
+source=( http://sourceforge.net/projects/tcl/files/Tcl/$version/tcl-core${version}-src.tar.gz)
 
 build()
 {
