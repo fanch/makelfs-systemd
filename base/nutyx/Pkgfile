@@ -16,8 +16,8 @@ build () {
 mkdir $PKG/{dev,proc,sys}
 mknod -m 600 $PKG/dev/console c 5 1
 mknod -m 666 $PKG/dev/null c 1 3
-mkdir -pv $PKG/{bin,boot,etc/{opt,sysconfig},home,lib/firmware,mnt,opt}
-mkdir -pv $PKG/{media/{floppy,cdrom},sbin,srv,var}
+mkdir -pv $PKG/{bin,boot,etc/{opt,sysconfig,systemd/network},home,lib/firmware,mnt,opt}
+mkdir -pv $PKG/{sbin,srv,var}
 install -dv -m 0750 $PKG/root
 install -dv -m 1777 $PKG/tmp $PKG/var/tmp
 mkdir -pv $PKG/usr/{,local/}{bin,include,lib,sbin,src}
@@ -345,7 +345,7 @@ devtmpfs       /dev         devtmpfs mode=0755,nosuid    0     0
 EOF
 
 cat > $PKG/etc/sysconfig/rc.site << "EOF"
-# rc.site                                                                            [20:15 i686 3.18.11-NuTyX-iso thierry@nutyx]
+# rc.site                                                                            
 # Optional parameters for boot scripts.
 
 # Distro Information
@@ -437,6 +437,7 @@ cat > $PKG/etc/sysconfig/console << "EOF"
 FONT="Lat2-Terminus16"
 UNICODE="1"
 LOGLEVEL=1
+KEYMAP=fr-latin9.map
 EOF
 
 cat > $PKG/etc/sysconfig/udev_retry << "EOF"
@@ -563,6 +564,29 @@ cat > $PKG/etc/hosts << "EOF"
 127.0.0.1 nutyx
 
 # End /etc/hosts
+EOF
+
+cat > $PKG/etc/systemd/network/10-eno1-dhcp.network << "EOF"
+[Match]
+Name=eno1
+
+[Network]
+DHCP=ipv4
+
+[DHCP]
+UseDomains=true
+EOF
+
+
+cat > $PKG/etc/systemd/network/10-eno1-static.network << "EOF"
+[Match]
+Name=eno1
+
+[Network]
+Address=192.168.0.2/24
+Gateway=192.168.0.1
+DNS=192.168.0.1
+Domains=
 EOF
 
 cat > $PKG/etc/shells << "EOF"
@@ -960,6 +984,14 @@ Section "InputClass"
 EndSection
 EOF
 
+cat > $PKG/etc/X11/xorg.conf.d/20-keyboard.conf << "EOF"
+Section "InputClass"
+  Identifier "Generic Keyboard"
+  MatchIsKeyboard "yes"
+  Option "XkbLayout" "fr"
+EndSection
+EOF
+
 # Usefull links
 cd $PKG/root/
 ln -s ../etc/fstab
@@ -967,7 +999,7 @@ ln -s ../boot/grub/grub.cfg
 ln -s ../etc/profile.d
 ln -s ../etc/modprobe.d
 ln -s ../etc/systemd
-ln -s ../etc/sysconfig
+ln -s ../etc/sysconfig/console
 ln -s ../etc/bashrc
 ln -s ../etc/cards.conf
 ln -s ../etc/pkgadd.conf
