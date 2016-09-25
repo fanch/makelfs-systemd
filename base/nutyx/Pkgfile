@@ -16,7 +16,7 @@ build () {
 mkdir $PKG/{dev,proc,sys}
 mknod -m 600 $PKG/dev/console c 5 1
 mknod -m 666 $PKG/dev/null c 1 3
-mkdir -pv $PKG/{bin,boot,etc/{opt,sysconfig,systemd/network},home,lib/firmware,mnt,opt}
+mkdir -pv $PKG/{bin,boot,etc/{opt,sysconfig,systemd/network},home,lib/firmware,mnt,opt,run}
 mkdir -pv $PKG/{sbin,srv,var}
 install -dv -m 0750 $PKG/root
 install -dv -m 1777 $PKG/tmp $PKG/var/tmp
