@@ -42,8 +42,8 @@ case $(uname -m) in
 esac
 
 mkdir -v $PKG/var/{log,mail,spool}
-ln -sv $PKG/run $PKG/var/run
-ln -sv $PKG/run/lock $PKG/var/lock
+ln -sv /run $PKG/var/run
+ln -sv /run/lock $PKG/var/lock
 mkdir -pv $PKG/var/{opt,cache,lib/{color,misc,locate},local}
 
 touch $PKG/var/log/{btmp,lastlog,wtmp}
