@@ -3,10 +3,10 @@
 # Packager: fanch at nutyx dot org
 
 name=flex
-version=2.6.1
+version=2.6.2
 release=1
 
-source=(http://prdownloads.sourceforge.net/flex/flex-$version.tar.xz)
+source=(http://prdownloads.sourceforge.net/flex/flex-$version.tar.gz)
 
 build() {
 cd flex-$version
