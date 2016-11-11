@@ -7,7 +7,7 @@ PKGMK_GROUPS=(man)
 PKGMK_IGNORE_RUNTIMEDEPS=yes
 
 name=nutyx
-version=7.9
+version=7.10
 release=1
 scripts=blfs-systemd-units
 scriptsversion=20160602
@@ -827,7 +827,7 @@ cat > $PKG/bin/nu << "EOF"
 ######################################
 
 user_groups=""
-default_groups=(users disk network floppy fuse video lp tty audio cdrom scanner adm vboxusers wheel)
+default_groups=(systemd-journal plugdev netdev users disk floppy fuse video lp tty audio cdrom halusers scanner adm wheel)
 
 # Avoid spaces troubles :)
 OLD_IFS=$IFS
