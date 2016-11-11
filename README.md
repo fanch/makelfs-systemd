@@ -198,9 +198,9 @@ for PACK in *.xz; do /tools/bin/pkgadd -r $LFS $PACK;done
 On vérifie qu'il est bien ajouté:
 /tools/bin/pkginfo -r $LFS -i|grep bash
 retourne
-bash 4.3.30
-bash.de 4.3.30
-bash.fr 4.3.30
+bash 4.4
+bash.de 4.4
+bash.fr 4.4
 ...
 
 19. Nous retournons dans notre NuTyX et finissons le travail:
