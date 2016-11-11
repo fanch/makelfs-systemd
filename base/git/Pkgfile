@@ -4,7 +4,7 @@
 
 description="Distributed version control system designed to handle small to very large projects."
 name=git
-version=2.9.1
+version=2.10.1
 release=1
 url="http://git-scm.com/"
 
